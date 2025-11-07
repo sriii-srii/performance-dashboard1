@@ -4,8 +4,18 @@
     { "path": "./tsconfig.app.json" },
     { "path": "./tsconfig.node.json" }
   ],
+  // 👈 ADD THIS SECTION
   "compilerOptions": {
-    "strict": false,
+    // Addresses the "forceConsistentCasingInFileNames" warning
+    "forceConsistentCasingInFileNames": true,
+    
+    // Addresses the "strict" warning (even though it's true in tsconfig.app.json, 
+    // setting it here satisfies the project-level check).
+    // Note: If you want to disable strict mode entirely, change this to `false`.
+    "strict": true, 
+    
+    // These options are usually kept here from your previous config,
+    // ensure they don't conflict with your app/node configs.
     "skipLibCheck": true,
     "noEmit": true
   }
