@@ -9,10 +9,10 @@
         </tr>
       </thead>
       <tbody>
-        <tr v-for="row in pagedRows" :key="row.timestamp + (row.category ?? '')">
+        <tr v-for="row in pagedRows" :key="(row.timestamp ?? 0) + (row.category ?? '')">
           <td>{{ row.timestamp }}</td>
-          <td>{{ row.value.toFixed(2) }}</td>
-          <td>{{ row.category }}</td>
+          <td>{{ (row.value ?? 0).toFixed(2) }}</td>
+          <td>{{ row.category ?? '' }}</td>
         </tr>
       </tbody>
     </table>
@@ -25,25 +25,28 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, computed } from 'vue';
-import type { DataPoint } from '../composables/useDataStream';
+import { ref, computed } from 'vue'
+import type { DataPoint } from '../composables/useDataStream'
 
 const props = defineProps<{
   rows: DataPoint[];
-}>();
+}>()
 
-const pageIndex = ref(0);
+const pageIndex = ref(0)
 
-const startIndex = computed(() => pageIndex.value * 100);
-const endIndex = computed(() => startIndex.value + 100);
+const startIndex = computed(() => pageIndex.value * 100)
+const endIndex = computed(() => startIndex.value + 100)
 const pagedRows = computed(() =>
   props.rows.slice().reverse().slice(startIndex.value, endIndex.value)
-);
+)
 
 function prevPage() {
-  if (pageIndex.value > 0) pageIndex.value--;
+  if (pageIndex.value > 0) pageIndex.value--
 }
 function nextPage() {
-  if ((pageIndex.value + 1) * 100 < props.rows.length) pageIndex.value++;
+  if ((pageIndex.value + 1) * 100 < props.rows.length) pageIndex.value++
 }
+</script>
+<script lang="ts">
+export default {};
 </script>
