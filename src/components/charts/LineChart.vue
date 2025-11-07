@@ -14,7 +14,7 @@
 
 <script lang="ts" setup>
 import { ref, watch, onMounted, onBeforeUnmount } from 'vue';
-import { DataPoint } from '../../composables/useDataStream';
+import type { DataPoint } from '../../composables/useDataStream';
 
 const props = defineProps<{
   data: DataPoint[];
