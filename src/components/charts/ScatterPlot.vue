@@ -23,7 +23,8 @@ function drawScatterPlot(ctx: CanvasRenderingContext2D, data: DataPoint[]) {
   ctx.clearRect(0, 0, width, height);
   if (!data.length) return;
 
-  const minTime = data[0].timestamp;
+ const minTime = data[0]?.timestamp ?? 0;
+
   const maxTime = data[data.length - 1].timestamp;
   const minVal = Math.min(...data.map(d => d.value));
   const maxVal = Math.max(...data.map(d => d.value));

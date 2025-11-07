@@ -26,7 +26,7 @@
 
 <script lang="ts" setup>
 import { ref, computed } from 'vue';
-import { DataPoint } from '../composables/useDataStream';
+import type { DataPoint } from '../composables/useDataStream';
 
 const props = defineProps<{
   rows: DataPoint[];

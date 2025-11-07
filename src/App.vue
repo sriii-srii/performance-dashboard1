@@ -24,11 +24,12 @@ function handlePeriod(newPeriod: string) {
   period.value = newPeriod;
 }
 
-const windowSizeMap = {
+const windowSizeMap: Record<string, number> = {
   '1min': 60 * 1000,
   '5min': 5 * 60 * 1000,
   '1hr': 60 * 60 * 1000
 };
+
 // Use worker for fast aggregation
 const rawAggregated = useAggregatedViaWorker(dataPoints, windowSizeMap[period.value]);
 const filteredAggregated = computed(() =>

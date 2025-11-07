@@ -22,9 +22,8 @@
 <script lang="ts" setup>
 import { ref, watchEffect } from 'vue';
 
-const props = defineProps<{
-  categories: string[];
-}>();
+// Only grab categories prop directly, no unused "props" variable!
+const { categories } = defineProps<{ categories: string[] }>();
 
 const emit = defineEmits<{
   (e: 'filter', filter: {category: string; min: number; max: number}): void;
@@ -47,7 +46,3 @@ watchEffect(() => {
   emitFilter();
 });
 </script>
-<script lang="ts">
-export default {};
-</script>
-
