@@ -13,11 +13,9 @@ const props = defineProps<{
   color?: string;
 }>();
 
-
 const width = props.width ?? 800;
 const height = props.height ?? 300;
 const color = props.color ?? '#f90';
-
 const canvasRef = ref<HTMLCanvasElement | null>(null);
 
 function drawBarChart(ctx: CanvasRenderingContext2D, data: DataPoint[]) {
@@ -25,9 +23,8 @@ function drawBarChart(ctx: CanvasRenderingContext2D, data: DataPoint[]) {
   if (!data.length) return;
 
   // Group by category
-  const categories = Array.from(new Set(data.map(d => d.category)));
-  const sums = categories.map(c => data.filter(d => d.category === c).reduce((s, d) => s + d.value, 0));
-
+  const categories = Array.from(new Set(data.map(d => d.category ?? '')));
+  const sums = categories.map(c => data.filter(d => (d.category ?? '') === c).reduce((s, d) => s + d.value, 0));
   const barWidth = (width - 40) / categories.length;
 
   ctx.fillStyle = color;
@@ -37,7 +34,7 @@ function drawBarChart(ctx: CanvasRenderingContext2D, data: DataPoint[]) {
     ctx.fillRect(x, y, barWidth * 0.8, height - y - 20);
     ctx.fillStyle = "#fff";
     ctx.font = "bold 14px Arial";
-    ctx.fillText(categories[idx], x, height - 6);
+    ctx.fillText(categories[idx] ?? '', x, height - 6);
     ctx.fillStyle = color;
   });
 }
@@ -53,17 +50,11 @@ function render() {
 }
 
 onMounted(render);
-
 watch(() => props.data, () => {});
-
 onBeforeUnmount(() => {
   if (animationId) cancelAnimationFrame(animationId);
 });
 </script>
-
 <script lang="ts">
 export default {};
 </script>
-
-
-

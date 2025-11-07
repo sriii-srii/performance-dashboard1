@@ -9,7 +9,7 @@
         </tr>
       </thead>
       <tbody>
-        <tr v-for="row in pagedRows" :key="row.timestamp + row.category">
+        <tr v-for="row in pagedRows" :key="row.timestamp + (row.category ?? '')">
           <td>{{ row.timestamp }}</td>
           <td>{{ row.value.toFixed(2) }}</td>
           <td>{{ row.category }}</td>
@@ -46,7 +46,4 @@ function prevPage() {
 function nextPage() {
   if ((pageIndex.value + 1) * 100 < props.rows.length) pageIndex.value++;
 }
-</script>
-<script lang="ts">
-export default {};
 </script>

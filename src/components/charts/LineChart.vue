@@ -26,7 +26,6 @@ const props = defineProps<{
 const width = props.width ?? 800;
 const height = props.height ?? 300;
 const color = props.color ?? '#00f';
-
 const canvasRef = ref<HTMLCanvasElement | null>(null);
 
 let xOffset = 0;
@@ -35,7 +34,6 @@ let isDragging = false;
 let dragStartX = 0;
 let dragStartOffset = 0;
 
-// Simple pan with mouse
 function onMouseDown(e: MouseEvent) {
   isDragging = true;
   dragStartX = e.offsetX;
@@ -54,38 +52,30 @@ function onWheel(e: WheelEvent) {
   e.preventDefault();
   if (e.deltaY < 0) zoom *= 1.1;
   else zoom /= 1.1;
-  zoom = Math.max(zoom, 0.05); // prevent flipping
+  zoom = Math.max(zoom, 0.05);
 }
 
-// Actual chart rendering
 function drawLineChart(ctx: CanvasRenderingContext2D, data: DataPoint[]) {
   ctx.clearRect(0, 0, width, height);
   if (!data.length) return;
-
-  // Pan/zoom logic
   const displayCount = Math.floor(data.length / zoom);
   const startIdx = Math.max(0, Math.min(data.length - displayCount, Math.floor(xOffset)));
   const shown = data.slice(startIdx, startIdx + displayCount);
-
-  const minTime = shown[0].timestamp;
-  const maxTime = shown[shown.length - 1].timestamp;
+  if (!shown.length) return;
+  const minTime = shown[0]?.timestamp ?? 0;
+  const maxTime = shown[shown.length - 1]?.timestamp ?? 0;
   const minVal = Math.min(...shown.map(d => d.value));
   const maxVal = Math.max(...shown.map(d => d.value));
-
   ctx.strokeStyle = color;
   ctx.lineWidth = 2;
   ctx.beginPath();
-
   shown.forEach((point, idx) => {
     const x = ((point.timestamp - minTime) / (maxTime - minTime || 1)) * (width - 40) + 20;
     const y = height - ((point.value - minVal) / (maxVal - minVal || 1)) * (height - 40) - 20;
     if (idx === 0) ctx.moveTo(x, y);
     else ctx.lineTo(x, y);
   });
-
   ctx.stroke();
-
-  // Draw pan/zoom info
   ctx.fillStyle = "#fff";
   ctx.font = "bold 14px Arial";
   ctx.fillText(`Pan: ${Math.round(xOffset)}, Zoom: ${zoom.toFixed(2)}`, 20, 22);
@@ -102,11 +92,7 @@ function render() {
 }
 
 onMounted(render);
-
-watch(() => props.data, () => {
-  // Redraw happens automatically on each frame
-});
-
+watch(() => props.data, () => {});
 onBeforeUnmount(() => {
   if (animationId) cancelAnimationFrame(animationId);
 });
@@ -114,4 +100,3 @@ onBeforeUnmount(() => {
 <script lang="ts">
 export default {};
 </script>
-

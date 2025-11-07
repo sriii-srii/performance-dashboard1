@@ -30,6 +30,7 @@ const windowSizeMap: Record<string, number> = {
   '1hr': 60 * 60 * 1000
 };
 
+
 // Use worker for fast aggregation
 const rawAggregated = useAggregatedViaWorker(dataPoints, windowSizeMap[period.value]);
 const filteredAggregated = computed(() =>

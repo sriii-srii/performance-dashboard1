@@ -14,20 +14,15 @@ const props = defineProps<{
 
 const width = props.width ?? 800;
 const height = props.height ?? 300;
-
 const canvasRef = ref<HTMLCanvasElement | null>(null);
 
 function drawHeatmap(ctx: CanvasRenderingContext2D, data: DataPoint[]) {
   ctx.clearRect(0, 0, width, height);
-
   if (!data.length) return;
 
-  // Simple binning into a grid
   const rows = 10, cols = 20;
   const minVal = Math.min(...data.map(d => d.value));
   const maxVal = Math.max(...data.map(d => d.value));
-
-  // Count per bin
   const bins: number[][] = Array.from({length: rows}, () => Array(cols).fill(0));
   data.forEach(point => {
     const row = Math.floor(((point.value - minVal) / (maxVal - minVal || 1)) * (rows - 1));
@@ -37,10 +32,9 @@ function drawHeatmap(ctx: CanvasRenderingContext2D, data: DataPoint[]) {
 
   const cellWidth = width / cols;
   const cellHeight = height / rows;
-
   bins.forEach((rowArr, r) => {
     rowArr.forEach((v, c) => {
-      const intensity = Math.min(255, v * 20); // tune as needed
+      const intensity = Math.min(255, v * 20);
       ctx.fillStyle = `rgb(${intensity},0,${255-intensity})`;
       ctx.fillRect(c * cellWidth, r * cellHeight, cellWidth, cellHeight);
     });
@@ -58,7 +52,6 @@ function render() {
 }
 
 onMounted(render);
-
 watch(() => props.data, () => {});
 onBeforeUnmount(() => {
   if (animationId) cancelAnimationFrame(animationId);
@@ -67,4 +60,3 @@ onBeforeUnmount(() => {
 <script lang="ts">
 export default {};
 </script>
-
