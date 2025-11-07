@@ -1,10 +1,5 @@
 <template>
-  <canvas
-    ref="canvasRef"
-    :width="width"
-    :height="height"
-    style="border:1px solid #eee; background:#222;"
-  />
+  <canvas ref="canvasRef" :width="width" :height="height" style="border:1px solid #eee; background:#222;" />
 </template>
 
 <script lang="ts" setup>
@@ -57,9 +52,7 @@ function render() {
 
 onMounted(render)
 watch(() => props.data, () => {})
-onBeforeUnmount(() => {
-  if (animationId) cancelAnimationFrame(animationId)
-})
+onBeforeUnmount(() => { if (animationId) cancelAnimationFrame(animationId) })
 </script>
 <script lang="ts">
 export default {};

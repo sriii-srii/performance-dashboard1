@@ -48,40 +48,27 @@ import DataTable from './components/DataTable.vue'
 import { useDataStream } from './composables/useDataStream'
 import type { DataPoint } from './composables/useDataStream'
 
-/**
- * 1) Get streams/aggregations from the composable.
- *    It returns an object of Refs/ComputedRefs. We read them safely.
- */
-const stream = useDataStream() // ✅ no args
+/** 1) Get data from composable (no args) */
+const stream = useDataStream() as any
 
 const baseData = computed<DataPoint[]>(() => {
-  const s: any = stream
-  const arr = s?.dataPoints?.value ?? s?.dataPoints ?? []
-  return Array.isArray(arr) ? (arr as DataPoint[]) : []
+  const arr = stream?.dataPoints?.value ?? stream?.dataPoints ?? []
+  return Array.isArray(arr) ? arr as DataPoint[] : []
 })
-
 const byMinute = computed<DataPoint[]>(() => {
-  const s: any = stream
-  const arr = s?.aggregateByMinute?.value ?? s?.aggregateByMinute ?? []
-  return Array.isArray(arr) ? (arr as DataPoint[]) : []
+  const arr = stream?.aggregateByMinute?.value ?? stream?.aggregateByMinute ?? []
+  return Array.isArray(arr) ? arr as DataPoint[] : []
 })
-
 const byFiveMinutes = computed<DataPoint[]>(() => {
-  const s: any = stream
-  const arr = s?.aggregateByFiveMinutes?.value ?? s?.aggregateByFiveMinutes ?? []
-  return Array.isArray(arr) ? (arr as DataPoint[]) : []
+  const arr = stream?.aggregateByFiveMinutes?.value ?? stream?.aggregateByFiveMinutes ?? []
+  return Array.isArray(arr) ? arr as DataPoint[] : []
 })
-
 const byHour = computed<DataPoint[]>(() => {
-  const s: any = stream
-  const arr = s?.aggregateByHour?.value ?? s?.aggregateByHour ?? []
-  return Array.isArray(arr) ? (arr as DataPoint[]) : []
+  const arr = stream?.aggregateByHour?.value ?? stream?.aggregateByHour ?? []
+  return Array.isArray(arr) ? arr as DataPoint[] : []
 })
 
-/**
- * 2) Time windows with exact key types (no implicit-any on indexing).
- *    Map window -> which dataset to use.
- */
+/** 2) Windows with exact key types (fixes index-signature error) */
 const windows = {
   '1min': 'minute',
   '5min': 'five',
@@ -90,11 +77,9 @@ const windows = {
 } as const
 type WindowKey = keyof typeof windows
 type WindowMode = (typeof windows)[WindowKey]
-
 const windowKeys = Object.keys(windows) as WindowKey[]
 const selectedWindow = ref<WindowKey>('all')
 
-/** Pick the right dataset based on the selected window */
 const windowedData = computed<DataPoint[]>(() => {
   const mode: WindowMode = windows[selectedWindow.value]
   switch (mode) {
@@ -106,11 +91,8 @@ const windowedData = computed<DataPoint[]>(() => {
   }
 })
 
-/**
- * 3) Category filter
- */
+/** 3) Category filter */
 const selectedCategory = ref<string>('all')
-
 const categories = computed<string[]>(() => {
   const set = new Set<string>()
   for (const d of baseData.value) {
@@ -119,17 +101,14 @@ const categories = computed<string[]>(() => {
   return Array.from(set)
 })
 
-/**
- * 4) Final filtered data (window + category) with safety guards.
- */
+/** 4) Final filtered set */
 const filteredData = computed<DataPoint[]>(() => {
   const src = windowedData.value
   if (!src.length) return []
   return src.filter(d => {
-    const catOk = selectedCategory.value === 'all'
+    return selectedCategory.value === 'all'
       ? true
       : (d.category ?? '') === selectedCategory.value
-    return catOk
   })
 })
 </script>

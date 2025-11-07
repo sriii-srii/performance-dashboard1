@@ -1,10 +1,5 @@
 <template>
-  <canvas
-    ref="canvasRef"
-    :width="width"
-    :height="height"
-    style="border:1px solid #eee; background:#222;"
-  />
+  <canvas ref="canvasRef" :width="width" :height="height" style="border:1px solid #eee; background:#222;" />
 </template>
 
 <script lang="ts" setup>
@@ -36,7 +31,9 @@ function drawHeatmap(ctx: CanvasRenderingContext2D, data: DataPoint[]) {
     const t = point.timestamp ?? 0
     const row = Math.floor(((v - minVal) / (maxVal - minVal || 1)) * (rows - 1))
     const col = Math.floor((t % (1000 * cols)) / 1000)
-    bins[Math.max(0, Math.min(rows - 1, row))][Math.max(0, Math.min(cols - 1, col))] += 1
+    const r = Math.max(0, Math.min(rows - 1, row))
+    const c = Math.max(0, Math.min(cols - 1, col))
+    bins[r][c] += 1  // <- indices clamped; no undefined
   })
 
   const cellWidth = width / cols
@@ -62,9 +59,7 @@ function render() {
 
 onMounted(render)
 watch(() => props.data, () => {})
-onBeforeUnmount(() => {
-  if (animationId) cancelAnimationFrame(animationId)
-})
+onBeforeUnmount(() => { if (animationId) cancelAnimationFrame(animationId) })
 </script>
 <script lang="ts">
 export default {};

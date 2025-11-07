@@ -34,23 +34,10 @@ let isDragging = false
 let dragStartX = 0
 let dragStartOffset = 0
 
-function onMouseDown(e: MouseEvent) {
-  isDragging = true
-  dragStartX = e.offsetX
-  dragStartOffset = xOffset
-}
-function onMouseMove(e: MouseEvent) {
-  if (isDragging) {
-    const dx = e.offsetX - dragStartX
-    xOffset = dragStartOffset + dx / zoom
-  }
-}
+function onMouseDown(e: MouseEvent) { isDragging = true; dragStartX = e.offsetX; dragStartOffset = xOffset }
+function onMouseMove(e: MouseEvent) { if (isDragging) { const dx = e.offsetX - dragStartX; xOffset = dragStartOffset + dx / zoom } }
 function onMouseUp() { isDragging = false }
-function onWheel(e: WheelEvent) {
-  e.preventDefault()
-  zoom = e.deltaY < 0 ? zoom * 1.1 : zoom / 1.1
-  zoom = Math.max(zoom, 0.05)
-}
+function onWheel(e: WheelEvent) { e.preventDefault(); zoom = e.deltaY < 0 ? zoom * 1.1 : zoom / 1.1; zoom = Math.max(zoom, 0.05) }
 
 function drawLineChart(ctx: CanvasRenderingContext2D, data: DataPoint[]) {
   ctx.clearRect(0, 0, width, height)
@@ -75,8 +62,7 @@ function drawLineChart(ctx: CanvasRenderingContext2D, data: DataPoint[]) {
     const v = point.value ?? minVal
     const x = ((t - minTime) / (maxTime - minTime || 1)) * (width - 40) + 20
     const y = height - ((v - minVal) / (maxVal - minVal || 1)) * (height - 40) - 20
-    if (idx === 0) ctx.moveTo(x, y)
-    else ctx.lineTo(x, y)
+    if (idx === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y)
   })
   ctx.stroke()
 
@@ -97,9 +83,7 @@ function render() {
 
 onMounted(render)
 watch(() => props.data, () => {})
-onBeforeUnmount(() => {
-  if (animationId) cancelAnimationFrame(animationId)
-})
+onBeforeUnmount(() => { if (animationId) cancelAnimationFrame(animationId) })
 </script>
 <script lang="ts">
 export default {};

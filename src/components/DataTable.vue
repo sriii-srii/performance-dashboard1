@@ -26,26 +26,22 @@
 
 <script lang="ts" setup>
 import { ref, computed } from 'vue'
-import type { DataPoint } from '../composables/useDataStream'
+import type { DataPoint } from '../composables/useDataStream'  // <- type-only
 
 const props = defineProps<{
   rows: DataPoint[];
 }>()
 
 const pageIndex = ref(0)
-
 const startIndex = computed(() => pageIndex.value * 100)
 const endIndex = computed(() => startIndex.value + 100)
+
 const pagedRows = computed(() =>
   props.rows.slice().reverse().slice(startIndex.value, endIndex.value)
 )
 
-function prevPage() {
-  if (pageIndex.value > 0) pageIndex.value--
-}
-function nextPage() {
-  if ((pageIndex.value + 1) * 100 < props.rows.length) pageIndex.value++
-}
+function prevPage() { if (pageIndex.value > 0) pageIndex.value-- }
+function nextPage() { if ((pageIndex.value + 1) * 100 < props.rows.length) pageIndex.value++ }
 </script>
 <script lang="ts">
 export default {};

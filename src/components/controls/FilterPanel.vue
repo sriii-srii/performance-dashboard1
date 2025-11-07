@@ -1,52 +1,103 @@
 <template>
-  <div style="display: flex; gap: 20px; margin-bottom: 12px;">
+  <div style="display:flex; gap:16px; align-items:center; margin-bottom:12px; flex-wrap:wrap;">
     <label>
       Category:
-      <select v-model="selectedCategory">
+      <select v-model="selectedCategory" style="padding:6px;">
         <option value="">All</option>
         <option v-for="c in categories" :key="c" :value="c">{{ c }}</option>
       </select>
     </label>
+
     <label>
       Min Value:
-      <input type="number" v-model.number="minValue" style="width:70px;" />
+      <input
+        type="number"
+        v-model.number="minValue"
+        style="width:90px; padding:6px;"
+        @keydown.enter.prevent="emitFilter"
+        placeholder="min"
+      />
     </label>
+
     <label>
       Max Value:
-      <input type="number" v-model.number="maxValue" style="width:70px;" />
+      <input
+        type="number"
+        v-model.number="maxValue"
+        style="width:90px; padding:6px;"
+        @keydown.enter.prevent="emitFilter"
+        placeholder="max"
+      />
     </label>
-    <button @click="emitFilter" style="margin-left:10px;">Apply</button>
+
+    <button @click="emitFilter" style="padding:6px 10px;">Apply</button>
+    <button @click="reset" style="padding:6px 10px;">Reset</button>
   </div>
 </template>
 
 <script lang="ts" setup>
-import { ref, watchEffect } from 'vue';
+import { ref, watch, onMounted } from 'vue'
 
-// Only grab categories prop directly, no unused "props" variable!
-const { categories } = defineProps<{ categories: string[] }>();
+/**
+ * Props
+ * - categories: list of available categories
+ * - defaultCategory/defaultMin/defaultMax: optional initial values
+ */
+const props = withDefaults(defineProps<{
+  categories: string[]
+  defaultCategory?: string
+  defaultMin?: number | null
+  defaultMax?: number | null
+}>(), {
+  defaultCategory: '',
+  defaultMin: null,
+  defaultMax: null
+})
 
+/** Emits a single "filter" event with normalized payload */
 const emit = defineEmits<{
-  (e: 'filter', filter: {category: string; min: number; max: number}): void;
-}>();
+  (e: 'filter', filter: { category: string; min: number | null; max: number | null }): void
+}>()
 
-const selectedCategory = ref('');
-const minValue = ref(10);
-const maxValue = ref(100);
+/** Local reactive state */
+const selectedCategory = ref<string>(props.defaultCategory)
+const minValue = ref<number | null>(props.defaultMin)
+const maxValue = ref<number | null>(props.defaultMax)
 
-function emitFilter() {
-  emit('filter', {
-    category: selectedCategory.value,
-    min: minValue.value,
-    max: maxValue.value,
-  });
+/** Ensure min ≤ max when both are present */
+function normalizeRange(): { min: number | null; max: number | null } {
+  let min = minValue.value
+  let max = maxValue.value
+  if (min != null && max != null && min > max) {
+    const tmp = min; min = max; max = tmp
+  }
+  return { min, max }
 }
 
-// Immediately emit the default filter on mount for reactivity
-watchEffect(() => {
-  emitFilter();
-});
-</script>
-<script lang="ts">
-export default {};
-</script>
+/** Public actions */
+function emitFilter() {
+  const { min, max } = normalizeRange()
+  emit('filter', {
+    category: selectedCategory.value,
+    min,
+    max
+  })
+}
 
+function reset() {
+  selectedCategory.value = props.defaultCategory
+  minValue.value = props.defaultMin
+  maxValue.value = props.defaultMax
+  emitFilter()
+}
+
+/** Auto-emit on any change (keeps parent in sync) */
+watch([selectedCategory, minValue, maxValue], () => {
+  emitFilter()
+})
+
+/** Emit initial filter on mount */
+onMounted(() => {
+  emitFilter()
+})
+</script>
