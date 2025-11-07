@@ -38,11 +38,6 @@
 <script lang="ts" setup>
 import { ref, watch, onMounted } from 'vue'
 
-/**
- * Props
- * - categories: list of available categories
- * - defaultCategory/defaultMin/defaultMax: optional initial values
- */
 const props = withDefaults(defineProps<{
   categories: string[]
   defaultCategory?: string
@@ -54,17 +49,14 @@ const props = withDefaults(defineProps<{
   defaultMax: null
 })
 
-/** Emits a single "filter" event with normalized payload */
 const emit = defineEmits<{
   (e: 'filter', filter: { category: string; min: number | null; max: number | null }): void
 }>()
 
-/** Local reactive state */
 const selectedCategory = ref<string>(props.defaultCategory)
 const minValue = ref<number | null>(props.defaultMin)
 const maxValue = ref<number | null>(props.defaultMax)
 
-/** Ensure min ≤ max when both are present */
 function normalizeRange(): { min: number | null; max: number | null } {
   let min = minValue.value
   let max = maxValue.value
@@ -74,7 +66,6 @@ function normalizeRange(): { min: number | null; max: number | null } {
   return { min, max }
 }
 
-/** Public actions */
 function emitFilter() {
   const { min, max } = normalizeRange()
   emit('filter', {
@@ -91,12 +82,10 @@ function reset() {
   emitFilter()
 }
 
-/** Auto-emit on any change (keeps parent in sync) */
 watch([selectedCategory, minValue, maxValue], () => {
   emitFilter()
 })
 
-/** Emit initial filter on mount */
 onMounted(() => {
   emitFilter()
 })
